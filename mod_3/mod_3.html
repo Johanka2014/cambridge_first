@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 3: Happy Holidays? - FCE Prep</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            background-color: #ecfeff; /* Cyan-50 tint */
+        }
+
+        /* Animated Background Blobs */
+        .blob {
+            position: absolute;
+            filter: blur(60px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 15s infinite alternate ease-in-out;
+            border-radius: 50%;
+        }
+
+        .blob-1 { top: -5%; left: -5%; width: 400px; height: 400px; background: #22d3ee; animation-delay: 0s; } /* Cyan */
+        .blob-2 { top: 40%; right: -5%; width: 300px; height: 300px; background: #fcd34d; animation-delay: 2s; } /* Amber */
+        .blob-3 { bottom: -10%; left: 20%; width: 350px; height: 350px; background: #34d399; animation-delay: 4s; } /* Emerald */
+        .blob-4 { top: 10%; right: 20%; width: 250px; height: 250px; background: #f472b6; animation-delay: 6s; } /* Pink */
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate(30px, 40px) scale(1.1) rotate(10deg); }
+            100% { transform: translate(-20px, 20px) scale(0.9) rotate(-5deg); }
+        }
+
+        /* Glassmorphism UI */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .nav-pill {
+            transition: all 0.3s ease;
+        }
+        .nav-pill.active {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            color: white;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Drag and Drop Styles */
+        .draggable {
+            cursor: grab;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .draggable:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+        }
+        .droppable {
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .droppable.drag-over {
+            background-color: #cffafe;
+            border-color: #06b6d4;
+            transform: scale(1.02);
+        }
+
+        /* Utility */
+        .hidden-section {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .visible-section {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Custom Inputs */
+        .g-input {
+            border: none;
+            border-bottom: 2px solid #cbd5e1;
+            background: transparent;
+            text-align: center;
+            font-weight: 600;
+            color: #0891b2;
+            width: 100px;
+            transition: border-color 0.3s;
+        }
+        .g-input:focus {
+            outline: none;
+            border-bottom-color: #06b6d4;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 relative selection:bg-cyan-200">
+
+    <!-- Background Animation Layer -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="sticky top-4 z-50 mx-4 md:mx-auto max-w-6xl">
+        <div class="glass-card px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold">
+                    <i class="fas fa-plane-departure"></i>
+                </div>
+                <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600">
+                    FCE Module 3
+                </h1>
+            </div>
+            
+            <div class="flex flex-wrap justify-center gap-2">
+                <button onclick="switchTab('home')" id="btn-home" class="nav-pill active px-5 py-2 rounded-full font-semibold text-sm md:text-base">Home</button>
+                <button onclick="switchTab('vocab')" id="btn-vocab" class="nav-pill px-5 py-2 rounded-full font-semibold text-sm md:text-base text-slate-600 hover:bg-white/50">Vocabulary</button>
+                <button onclick="switchTab('grammar')" id="btn-grammar" class="nav-pill px-5 py-2 rounded-full font-semibold text-sm md:text-base text-slate-600 hover:bg-white/50">Grammar</button>
+                <button onclick="switchTab('exam')" id="btn-exam" class="nav-pill px-5 py-2 rounded-full font-semibold text-sm md:text-base text-slate-600 hover:bg-white/50">Exam Practice</button>
+                <button onclick="switchTab('writing')" id="btn-writing" class="nav-pill px-5 py-2 rounded-full font-semibold text-sm md:text-base text-slate-600 hover:bg-white/50">Writing</button>
+                <button onclick="switchTab('review')" id="btn-review" class="nav-pill px-5 py-2 rounded-full font-semibold text-sm md:text-base text-slate-600 hover:bg-white/50">Review</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="max-w-5xl mx-auto mt-8 mb-12 px-4 relative z-10">
+
+        <!-- ================= HOME SECTION ================= -->
+        <section id="home" class="visible-section">
+            <div class="glass-card p-10 text-center">
+                <h2 class="text-4xl md:text-6xl font-extrabold mb-6 text-slate-800">
+                    Happy Holidays?
+                </h2>
+                <p class="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+                    Module 3 focuses on travel, holidays, and adventures. 
+                    Master past tenses, travel vocabulary, and report writing for the FCE exam.
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div onclick="switchTab('vocab')" class="bg-white/80 p-6 rounded-2xl shadow-sm hover:shadow-xl transition cursor-pointer transform hover:-translate-y-1 border-t-4 border-cyan-500">
+                        <i class="fas fa-suitcase-rolling text-4xl text-cyan-500 mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">Travel Vocabulary</h3>
+                        <p class="text-slate-500">Holiday types, confusion words, and suffixes.</p>
+                    </div>
+                    <div onclick="switchTab('grammar')" class="bg-white/80 p-6 rounded-2xl shadow-sm hover:shadow-xl transition cursor-pointer transform hover:-translate-y-1 border-t-4 border-amber-500">
+                        <i class="fas fa-history text-4xl text-amber-500 mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">Past Tenses</h3>
+                        <p class="text-slate-500">Simple, Continuous, Perfect & 'Used to'.</p>
+                    </div>
+                    <div onclick="switchTab('writing')" class="bg-white/80 p-6 rounded-2xl shadow-sm hover:shadow-xl transition cursor-pointer transform hover:-translate-y-1 border-t-4 border-emerald-500">
+                        <i class="fas fa-file-alt text-4xl text-emerald-500 mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">Report Writing</h3>
+                        <p class="text-slate-500">Structure a formal report for Part 2.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VOCABULARY SECTION ================= -->
+        <section id="vocab" class="hidden-section">
+            <div class="space-y-8">
+                
+                <!-- Activity 1: Holiday Sorting -->
+                <div class="glass-card p-8 border-l-8 border-cyan-500">
+                    <h2 class="text-2xl font-bold text-cyan-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-umbrella-beach"></i> Types of Holiday
+                    </h2>
+                    <p class="text-slate-600 mb-6 text-sm">Sort the words and phrases into the correct columns.</p>
+
+                    <div class="bg-cyan-50 p-4 rounded-xl border border-cyan-100 mb-6">
+                        <div class="flex flex-wrap gap-2 justify-center" id="holiday-bank">
+                            <!-- Items from SB p.30 -->
+                            <span class="draggable cursor-grab bg-white border border-cyan-200 px-3 py-1 rounded shadow-sm hover:bg-cyan-100" draggable="true" ondragstart="drag(event)" id="h1" data-cat="type">camping holiday</span>
+                            <span class="draggable cursor-grab bg-white border border-cyan-200 px-3 py-1 rounded shadow-sm hover:bg-cyan-100" draggable="true" ondragstart="drag(event)" id="h2" data-cat="loc">at a campsite</span>
+                            <span class="draggable cursor-grab bg-white border border-cyan-200 px-3 py-1 rounded shadow-sm hover:bg-cyan-100" draggable="true" ondragstart="drag(event)" id="h3" data-cat="act">walking and climbing</span>
+                            <span class="draggable cursor-grab bg-white border border-cyan-200 px-3 py-1 rounded shadow-sm hover:bg-cyan-100" draggable="true" ondragstart="drag(event)" id="h4" data-cat="loc">at a luxury hotel</span>
+                            <span class="draggable cursor-grab bg-white border border-cyan-200 px-3 py-1 rounded shadow-sm hover:bg-cyan-100" draggable="true" ondragstart="drag(event)" id="h5" data-cat="type">beach holiday</span>
+                            <span class="draggable cursor-grab bg-white border border-cyan-200 px-3 py-1 rounded shadow-sm hover:bg-cyan-100" draggable="true" ondragstart="drag(event)" id="h6" data-cat="loc">on a cruise ship</span>
+                            <span class="draggable cursor-grab bg-white border border-cyan-200 px-3 py-1 rounded shadow-sm hover:bg-cyan-100" draggable="true" ondragstart="drag(event)" id="h7" data-cat="act">meeting new people</span>
+                            <span class="draggable cursor-grab bg-white border border-cyan-200 px-3 py-1 rounded shadow-sm hover:bg-cyan-100" draggable="true" ondragstart="drag(event)" id="h8" data-cat="act">sunbathing</span>
+                            <span class="draggable cursor-grab bg-white border border-cyan-200 px-3 py-1 rounded shadow-sm hover:bg-cyan-100" draggable="true" ondragstart="drag(event)" id="h9" data-cat="type">sightseeing tour</span>
+                            <span class="draggable cursor-grab bg-white border border-cyan-200 px-3 py-1 rounded shadow-sm hover:bg-cyan-100" draggable="true" ondragstart="drag(event)" id="h10" data-cat="act">relaxing</span>
+                            <span class="draggable cursor-grab bg-white border border-cyan-200 px-3 py-1 rounded shadow-sm hover:bg-cyan-100" draggable="true" ondragstart="drag(event)" id="h11" data-cat="type">cruise</span>
+                            <span class="draggable cursor-grab bg-white border border-cyan-200 px-3 py-1 rounded shadow-sm hover:bg-cyan-100" draggable="true" ondragstart="drag(event)" id="h12" data-cat="loc">at a youth hostel</span>
+                            <span class="draggable cursor-grab bg-white border border-cyan-200 px-3 py-1 rounded shadow-sm hover:bg-cyan-100" draggable="true" ondragstart="drag(event)" id="h13" data-cat="type">backpacking</span>
+                            <span class="draggable cursor-grab bg-white border border-cyan-200 px-3 py-1 rounded shadow-sm hover:bg-cyan-100" draggable="true" ondragstart="drag(event)" id="h14" data-cat="act">visiting monuments</span>
+                            <span class="draggable cursor-grab bg-white border border-cyan-200 px-3 py-1 rounded shadow-sm hover:bg-cyan-100" draggable="true" ondragstart="drag(event)" id="h15" data-cat="loc">in the city centre</span>
+                            <span class="draggable cursor-grab bg-white border border-cyan-200 px-3 py-1 rounded shadow-sm hover:bg-cyan-100" draggable="true" ondragstart="drag(event)" id="h16" data-cat="loc">at the seaside</span>
+                            <span class="draggable cursor-grab bg-white border border-cyan-200 px-3 py-1 rounded shadow-sm hover:bg-cyan-100" draggable="true" ondragstart="drag(event)" id="h17" data-cat="act">seeing new places</span>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="bg-white border-2 border-dashed border-cyan-300 rounded-xl p-4 min-h-[150px] droppable" ondrop="drop(event)" ondragover="allowDrop(event)" data-target="type">
+                            <h4 class="font-bold text-center text-cyan-800 mb-3 text-sm uppercase">Types of Holiday</h4>
+                            <div class="content-area flex flex-wrap gap-2 justify-center"></div>
+                        </div>
+                        <div class="bg-white border-2 border-dashed border-cyan-300 rounded-xl p-4 min-h-[150px] droppable" ondrop="drop(event)" ondragover="allowDrop(event)" data-target="loc">
+                            <h4 class="font-bold text-center text-cyan-800 mb-3 text-sm uppercase">Locations / Places</h4>
+                            <div class="content-area flex flex-wrap gap-2 justify-center"></div>
+                        </div>
+                        <div class="bg-white border-2 border-dashed border-cyan-300 rounded-xl p-4 min-h-[150px] droppable" ondrop="drop(event)" ondragover="allowDrop(event)" data-target="act">
+                            <h4 class="font-bold text-center text-cyan-800 mb-3 text-sm uppercase">Activities</h4>
+                            <div class="content-area flex flex-wrap gap-2 justify-center"></div>
+                        </div>
+                    </div>
+                    <button onclick="checkHolidaySort()" class="mt-6 w-full bg-cyan-600 text-white font-bold py-2 rounded hover:bg-cyan-700 transition">Check Sorting</button>
+                </div>
+
+                <!-- Activity 2: Travel Words -->
+                <div class="glass-card p-8 border-l-8 border-blue-500">
+                    <h2 class="text-2xl font-bold text-blue-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-map-signs"></i> Travel, Journey, Trip or Way?
+                    </h2>
+                    
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-blue-50 p-4 rounded-xl text-sm border border-blue-100">
+                            <h4 class="font-bold text-blue-900 mb-2">Definitions:</h4>
+                            <ul class="space-y-2 list-disc pl-4 text-slate-700">
+                                <li><strong>Trip:</strong> A journey in which you visit a place for a short time and come back again.</li>
+                                <li><strong>Way:</strong> Refers only to the route/direction to get from A to B.</li>
+                                <li><strong>Travel:</strong> A general word (usually uncountable noun or verb) meaning the activity of travelling.</li>
+                                <li><strong>Journey:</strong> Use this to talk about *when* you travel from one place to another (the process).</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="space-y-3 text-sm">
+                            <div class="bg-white p-2 rounded shadow-sm">
+                                1. She met interesting people during her weekend <select class="conf-word border-b border-blue-300 bg-transparent text-blue-700 font-bold outline-none" data-ans="trip"><option></option><option>travel</option><option>trip</option><option>journey</option></select> to Montreal.
+                            </div>
+                            <div class="bg-white p-2 rounded shadow-sm">
+                                2. We stopped at the supermarket on the <select class="conf-word border-b border-blue-300 bg-transparent text-blue-700 font-bold outline-none" data-ans="way"><option></option><option>way</option><option>trip</option></select> to the beach.
+                            </div>
+                            <div class="bg-white p-2 rounded shadow-sm">
+                                3. People spend more on foreign <select class="conf-word border-b border-blue-300 bg-transparent text-blue-700 font-bold outline-none" data-ans="travel"><option></option><option>travel</option><option>journey</option></select> than 50 years ago.
+                            </div>
+                            <div class="bg-white p-2 rounded shadow-sm">
+                                4. The <select class="conf-word border-b border-blue-300 bg-transparent text-blue-700 font-bold outline-none" data-ans="journey"><option></option><option>travel</option><option>journey</option></select> to my village takes three hours.
+                            </div>
+                            <div class="bg-white p-2 rounded shadow-sm">
+                                5. Can you tell me the best <select class="conf-word border-b border-blue-300 bg-transparent text-blue-700 font-bold outline-none" data-ans="way"><option></option><option>journey</option><option>way</option></select> to the bus station?
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="checkConfusingWords()" class="mt-6 w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700 transition">Check Answers</button>
+                </div>
+
+                <!-- Activity 3: Word Formation -->
+                <div class="glass-card p-8 border-l-8 border-indigo-500">
+                    <h2 class="text-2xl font-bold text-indigo-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-magic"></i> Word Formation: Adjectives
+                    </h2>
+                    <p class="text-slate-600 mb-4 text-sm">Change the nouns/verbs into adjectives using suffixes (-al, -ous, -ly, -able, etc.).</p>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div class="bg-indigo-50 p-3 rounded">
+                            <span class="block text-xs font-bold text-indigo-400 uppercase">Nature</span>
+                            <input type="text" class="w-full bg-transparent border-b border-indigo-300 text-indigo-900 wf-adj" data-ans="natural">
+                        </div>
+                        <div class="bg-indigo-50 p-3 rounded">
+                            <span class="block text-xs font-bold text-indigo-400 uppercase">Adventure</span>
+                            <input type="text" class="w-full bg-transparent border-b border-indigo-300 text-indigo-900 wf-adj" data-ans="adventurous">
+                        </div>
+                        <div class="bg-indigo-50 p-3 rounded">
+                            <span class="block text-xs font-bold text-indigo-400 uppercase">Friend</span>
+                            <input type="text" class="w-full bg-transparent border-b border-indigo-300 text-indigo-900 wf-adj" data-ans="friendly">
+                        </div>
+                        <div class="bg-indigo-50 p-3 rounded">
+                            <span class="block text-xs font-bold text-indigo-400 uppercase">Memory</span>
+                            <input type="text" class="w-full bg-transparent border-b border-indigo-300 text-indigo-900 wf-adj" data-ans="memorable">
+                        </div>
+                        <div class="bg-indigo-50 p-3 rounded">
+                            <span class="block text-xs font-bold text-indigo-400 uppercase">Mystery</span>
+                            <input type="text" class="w-full bg-transparent border-b border-indigo-300 text-indigo-900 wf-adj" data-ans="mysterious">
+                        </div>
+                        <div class="bg-indigo-50 p-3 rounded">
+                            <span class="block text-xs font-bold text-indigo-400 uppercase">Risk</span>
+                            <input type="text" class="w-full bg-transparent border-b border-indigo-300 text-indigo-900 wf-adj" data-ans="risky">
+                        </div>
+                        <div class="bg-indigo-50 p-3 rounded">
+                            <span class="block text-xs font-bold text-indigo-400 uppercase">Crowd</span>
+                            <input type="text" class="w-full bg-transparent border-b border-indigo-300 text-indigo-900 wf-adj" data-ans="crowded">
+                        </div>
+                        <div class="bg-indigo-50 p-3 rounded">
+                            <span class="block text-xs font-bold text-indigo-400 uppercase">Access</span>
+                            <input type="text" class="w-full bg-transparent border-b border-indigo-300 text-indigo-900 wf-adj" data-ans="accessible">
+                        </div>
+                    </div>
+                    <button onclick="checkWFAdjectives()" class="mt-6 w-full bg-indigo-600 text-white font-bold py-2 rounded hover:bg-indigo-700 transition">Check Adjectives</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= GRAMMAR SECTION ================= -->
+        <section id="grammar" class="hidden-section">
+            <div class="space-y-8">
+                
+                <!-- Activity 1: Past Tenses -->
+                <div class="glass-card p-8 border-l-8 border-amber-500">
+                    <h2 class="text-2xl font-bold text-amber-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-clock"></i> Past Simple, Continuous & Used to
+                    </h2>
+                    <p class="text-slate-600 mb-4 text-sm">Choose the correct verb form.</p>
+                    
+                    <div class="space-y-3 text-sm">
+                        <div class="bg-white p-3 rounded border border-amber-100">
+                            1. When he <select class="g-sel border-amber-300 rounded"><option>walked</option><option value="c">was walking</option></select> home, he found a wallet.
+                        </div>
+                        <div class="bg-white p-3 rounded border border-amber-100">
+                            2. When I was at primary school, I <select class="g-sel border-amber-300 rounded"><option>was doing</option><option value="c">used to do</option></select> one hour's homework a day.
+                        </div>
+                        <div class="bg-white p-3 rounded border border-amber-100">
+                            3. As soon as Mandy <select class="g-sel border-amber-300 rounded"><option>was getting</option><option value="c">got</option></select> Simon's text, she jumped on her bike.
+                        </div>
+                        <div class="bg-white p-3 rounded border border-amber-100">
+                            4. When I was younger, we <select class="g-sel border-amber-300 rounded"><option value="c">used to spend</option><option>were spending</option></select> holidays in the village.
+                        </div>
+                        <div class="bg-white p-3 rounded border border-amber-100">
+                            5. Luckily, we <select class="g-sel border-amber-300 rounded"><option>walked</option><option value="c">were walking</option></select> past a shop when the storm began.
+                        </div>
+                    </div>
+                    <button onclick="checkGrammarSelects()" class="mt-6 w-full bg-amber-500 text-white font-bold py-2 rounded hover:bg-amber-600 transition">Check Tenses</button>
+                </div>
+
+                <!-- Activity 2: Prepositions of Time -->
+                <div class="glass-card p-8 border-l-8 border-rose-500">
+                    <h2 class="text-2xl font-bold text-rose-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-calendar-alt"></i> Time Phrases: at, in, on
+                    </h2>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 text-sm">
+                        <div class="bg-rose-50 p-4 rounded-xl">
+                            <h4 class="font-bold text-rose-900 mb-2">Rules Reminder:</h4>
+                            <ul class="list-disc pl-4 space-y-1 text-slate-700">
+                                <li><strong>IN:</strong> Months, years, seasons, 'the morning/afternoon'.</li>
+                                <li><strong>ON:</strong> Days, dates, 'Sunday morning'.</li>
+                                <li><strong>AT:</strong> Times (11.00), 'night', 'the weekend'.</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-2">
+                                1. We got up late <input type="text" class="g-input w-16" data-ans="in"> the morning.
+                            </div>
+                            <div class="flex items-center gap-2">
+                                2. Except <input type="text" class="g-input w-16" data-ans="on"> days when it was cloudy.
+                            </div>
+                            <div class="flex items-center gap-2">
+                                3. But <input type="text" class="g-input w-16" data-ans="at"> night, we were at the clubs.
+                            </div>
+                            <div class="flex items-center gap-2">
+                                4. We got back <input type="text" class="g-input w-16" data-ans="at"> three in the morning.
+                            </div>
+                            <div class="flex items-center gap-2">
+                                5. I went off with friends <input type="text" class="g-input w-16" data-ans="in"> March.
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="checkPrepositions()" class="mt-6 w-full bg-rose-500 text-white font-bold py-2 rounded hover:bg-rose-600 transition">Check Prepositions</button>
+                </div>
+
+                <!-- Activity 3: Past Perfect -->
+                <div class="glass-card p-8 border-l-8 border-purple-500">
+                    <h2 class="text-2xl font-bold text-purple-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-fast-backward"></i> Past Perfect
+                    </h2>
+                    <p class="text-slate-600 mb-4 text-sm">Fill in the gaps with the verb in brackets (Past Perfect Simple or Continuous).</p>
+                    
+                    <div class="space-y-4 text-sm">
+                        <div class="bg-purple-50 p-3 rounded">
+                            1. The storm damaged the house where she <input type="text" class="g-input w-32" data-ans="had been living"> (live) since she left school.
+                        </div>
+                        <div class="bg-purple-50 p-3 rounded">
+                            2. We <input type="text" class="g-input w-32" data-ans="had been walking"> (walk) up the mountain for three hours when it rained.
+                        </div>
+                        <div class="bg-purple-50 p-3 rounded">
+                            3. I <input type="text" class="g-input w-32" data-ans="had already finished"> (already finish) the work when she offered to help.
+                        </div>
+                        <div class="bg-purple-50 p-3 rounded">
+                            4. I <input type="text" class="g-input w-32" data-ans="had only been speaking"> (only speak) for 30 seconds when he interrupted.
+                        </div>
+                    </div>
+                    <button onclick="checkPastPerfect()" class="mt-6 w-full bg-purple-600 text-white font-bold py-2 rounded hover:bg-purple-700 transition">Check Past Perfect</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= EXAM SECTION ================= -->
+        <section id="exam" class="hidden-section">
+            <div class="glass-card p-8">
+                <div class="mb-8 bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded-r-lg">
+                    <h2 class="text-2xl font-bold text-yellow-800 mb-2">Use of English & Reading</h2>
+                    <p class="text-yellow-800 text-sm">Part 3 (Word Formation) and Part 7 (Multiple Matching).</p>
+                </div>
+
+                <div class="space-y-8">
+                    <!-- Part 3: Word Formation -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                        <h3 class="font-bold text-slate-800 mb-4">Part 3: A bus journey</h3>
+                        <p class="text-xs text-slate-500 mb-4">Form the correct word from the capital word at the end of the line.</p>
+                        
+                        <div class="space-y-4 text-sm leading-8">
+                            <p>Tasha climbed onto a (0) <strong>crowded</strong> (CROWD) bus. The wooden seats looked quite 
+                            (1) <input type="text" class="g-input w-32 uppercase text-xs" data-ans="UNCOMFORTABLE"> (COMFORT) so she decided to stand, even though a 
+                            (2) <input type="text" class="g-input w-32 uppercase text-xs" data-ans="THOUGHTFUL"> (THOUGHT) passenger offered her a seat. The bus filled with women in 
+                            (3) <input type="text" class="g-input w-32 uppercase text-xs" data-ans="COLOURFUL"> (COLOUR) clothes. "This is an 
+                            (4) <input type="text" class="g-input w-32 uppercase text-xs" data-ans="UNFORGETTABLE"> (FORGET) experience," thought Tasha, who was beginning to feel 
+                            (5) <input type="text" class="g-input w-32 uppercase text-xs" data-ans="OPTIMISTIC"> (OPTIMIST). The noise became 
+                            (6) <input type="text" class="g-input w-32 uppercase text-xs" data-ans="CONSIDERABLE"> (CONSIDER). Tasha began to feel 
+                            (7) <input type="text" class="g-input w-32 uppercase text-xs" data-ans="ANXIOUS"> (ANXIETY) about getting off. Fortunately, a 
+                            (8) <input type="text" class="g-input w-32 uppercase text-xs" data-ans="SYMPATHETIC"> (SYMPATHY) passenger helped her.</p>
+                        </div>
+                        <button onclick="checkExamPart3()" class="mt-6 bg-yellow-500 text-white font-bold py-2 px-6 rounded hover:bg-yellow-600 transition">Check Part 3</button>
+                    </div>
+
+                    <!-- Part 7: Reading Matching -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                        <h3 class="font-bold text-slate-800 mb-4">Part 7: Nightmare Holidays</h3>
+                        <p class="text-xs text-slate-500 mb-4">Match the questions (1-10) to the people (A-D).</p>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs">
+                            <div class="bg-slate-50 p-2 rounded">
+                                <span class="block mb-1 font-bold">1. Hide from danger?</span>
+                                <select class="p7-sel w-full" data-ans="B"><option>-</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded">
+                                <span class="block mb-1 font-bold">2. Intimidating employee?</span>
+                                <select class="p7-sel w-full" data-ans="C"><option>-</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded">
+                                <span class="block mb-1 font-bold">3. Not pleased to stay long?</span>
+                                <select class="p7-sel w-full" data-ans="C"><option>-</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded">
+                                <span class="block mb-1 font-bold">4. Visited before?</span>
+                                <select class="p7-sel w-full" data-ans="D"><option>-</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded">
+                                <span class="block mb-1 font-bold">5. Worried about strength?</span>
+                                <select class="p7-sel w-full" data-ans="B"><option>-</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded">
+                                <span class="block mb-1 font-bold">6. Missed speaking?</span>
+                                <select class="p7-sel w-full" data-ans="D"><option>-</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded">
+                                <span class="block mb-1 font-bold">7. Painful experience?</span>
+                                <select class="p7-sel w-full" data-ans="A"><option>-</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded">
+                                <span class="block mb-1 font-bold">8. Ex-criminal?</span>
+                                <select class="p7-sel w-full" data-ans="C"><option>-</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded">
+                                <span class="block mb-1 font-bold">9. Unaware of danger?</span>
+                                <select class="p7-sel w-full" data-ans="A"><option>-</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded">
+                                <span class="block mb-1 font-bold">10. Mistake before arriving?</span>
+                                <select class="p7-sel w-full" data-ans="D"><option>-</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+                            </div>
+                        </div>
+                        <button onclick="checkExamPart7()" class="mt-6 bg-yellow-500 text-white font-bold py-2 px-6 rounded hover:bg-yellow-600 transition">Check Part 7</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= WRITING SECTION ================= -->
+        <section id="writing" class="hidden-section">
+            <div class="glass-card p-8">
+                <h2 class="text-3xl font-bold text-emerald-600 mb-6 flex items-center gap-3">
+                    <i class="fas fa-pen-nib"></i> Writing Part 2: Report
+                </h2>
+                
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <!-- Task Prompt -->
+                    <div class="lg:w-1/3 space-y-4">
+                        <div class="bg-white p-6 rounded-xl shadow border-2 border-slate-100">
+                            <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-1 rounded mb-2 inline-block">TASK</span>
+                            <h3 class="font-bold text-xl mb-2">Excursion Report</h3>
+                            <p class="text-slate-600 text-sm mb-4">You recently made a one-day excursion with your class to a local place of interest. The director has asked for a report.</p>
+                            <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                                <li>Explain what you did.</li>
+                                <li>Say why you think the day was a success.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+                            <h4 class="font-bold text-emerald-800 mb-2">Report Structure:</h4>
+                            <ul class="text-sm space-y-2 text-emerald-700">
+                                <li><i class="fas fa-check-circle"></i> <strong>Title:</strong> e.g., Excursion to London</li>
+                                <li><i class="fas fa-check-circle"></i> <strong>Headings:</strong> Use clear headings for each section (e.g., Purpose, Activities, Comments).</li>
+                                <li><i class="fas fa-check-circle"></i> <strong>Introduction:</strong> State the purpose of the trip.</li>
+                                <li><i class="fas fa-check-circle"></i> <strong>Recommendation:</strong> Conclude with your opinion.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Writing Area -->
+                    <div class="lg:w-2/3">
+                        <div class="bg-white p-4 rounded-xl shadow-inner border border-slate-200 h-full flex flex-col">
+                            <input type="text" placeholder="Report Title..." class="w-full text-xl font-bold border-b border-gray-200 pb-2 mb-4 focus:outline-none focus:border-emerald-500">
+                            <textarea id="report-text" class="flex-grow w-full resize-none focus:outline-none text-slate-700 leading-relaxed min-h-[300px]" placeholder="Start writing your report here... Remember to use headings!"></textarea>
+                            <div class="mt-4 flex justify-between items-center text-sm text-slate-500 pt-4 border-t border-slate-100">
+                                <span id="word-count" class="font-mono bg-slate-100 px-2 py-1 rounded">0 words</span>
+                                <button onclick="document.getElementById('report-text').value = ''; updateCount()" class="text-red-400 hover:text-red-600">Clear Text</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= REVIEW SECTION ================= -->
+        <section id="review" class="hidden-section">
+            <div class="glass-card p-8 border-t-8 border-teal-500">
+                <h2 class="text-3xl font-bold text-teal-700 mb-6 flex items-center gap-3">
+                    <i class="fas fa-sync"></i> Module 3 Review
+                </h2>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- WB Past Tenses -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-teal-100">
+                        <h3 class="font-bold text-teal-800 mb-4">Past Tense Review</h3>
+                        <p class="text-xs text-slate-500 mb-4">Complete with: Past Simple, Continuous, Perfect Simple or Perfect Continuous.</p>
+                        <div class="space-y-3 text-sm">
+                            <div>1. The crowd <input type="text" class="g-input w-24" data-ans="had been waiting"> (wait) for over an hour.</div>
+                            <div>2. We <input type="text" class="g-input w-24" data-ans="had been trying"> (try) to open the door when Ali found her key.</div>
+                            <div>3. When he died, he <input type="text" class="g-input w-24" data-ans="had owned"> (own) the business for 50 years.</div>
+                            <div>4. David <input type="text" class="g-input w-24" data-ans="had been feeling"> (feel) unwell so he went to the doctor.</div>
+                        </div>
+                        <button onclick="checkReviewWB()" class="mt-4 w-full bg-teal-500 text-white font-bold py-2 rounded hover:bg-teal-600 transition">Check Grammar</button>
+                    </div>
+
+                    <!-- Travel Words -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-teal-100">
+                        <h3 class="font-bold text-teal-800 mb-4">Travel Words</h3>
+                        <div class="space-y-3 text-sm">
+                            <div>1. <input type="text" class="g-input w-24" data-ans="backpacking"> is popular with young people who want to see the world.</div>
+                            <div>2. Don't miss your <input type="text" class="g-input w-24" data-ans="flight"> at the airport.</div>
+                            <div>3. The <input type="text" class="g-input w-24" data-ans="journey"> from Brussels to London is only two hours.</div>
+                            <div>4. We went on a sightseeing <input type="text" class="g-input w-24" data-ans="tour">.</div>
+                        </div>
+                        <button onclick="checkReviewVocab()" class="mt-4 w-full bg-teal-500 text-white font-bold py-2 rounded hover:bg-teal-600 transition">Check Vocab</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 relative z-10 text-slate-500 text-sm">
+        <p>© 2024 FCE Study Zone | Module 3 Happy Holidays?</p>
+    </footer>
+
+    <script>
+        // --- Navigation ---
+        function switchTab(tabId) {
+            const sections = ['home', 'vocab', 'grammar', 'exam', 'writing', 'review'];
+            sections.forEach(s => {
+                document.getElementById(s).classList.remove('visible-section');
+                document.getElementById(s).classList.add('hidden-section');
+                
+                const btn = document.getElementById('btn-' + s);
+                if(btn) {
+                    btn.classList.remove('active', 'text-white', 'bg-gradient-to-r', 'from-cyan-600', 'to-indigo-600', 'shadow-lg');
+                    btn.classList.add('text-slate-600');
+                    if (s === tabId) {
+                        btn.classList.add('active');
+                        btn.classList.remove('text-slate-600');
+                    }
+                }
+            });
+            setTimeout(() => {
+                document.getElementById(tabId).classList.remove('hidden-section');
+                document.getElementById(tabId).classList.add('visible-section');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 100);
+        }
+
+        // --- Drag & Drop Holiday Sort ---
+        function allowDrop(ev) { ev.preventDefault(); ev.target.closest('.droppable').classList.add('drag-over'); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function drop(ev) {
+            ev.preventDefault();
+            const dropZone = ev.target.closest('.droppable');
+            dropZone.classList.remove('drag-over');
+            const data = ev.dataTransfer.getData("text");
+            const draggedElement = document.getElementById(data);
+            
+            // Only allow appending to the content area div
+            const contentArea = dropZone.querySelector('.content-area');
+            if(contentArea) {
+                contentArea.appendChild(draggedElement);
+            }
+        }
+
+        function checkHolidaySort() {
+            const items = document.querySelectorAll('.draggable');
+            items.forEach(item => {
+                const parent = item.parentElement.parentElement; // content-area -> droppable
+                const targetCat = parent.getAttribute('data-target');
+                const itemCat = item.getAttribute('data-cat');
+                
+                // Reset
+                item.classList.remove('bg-green-100', 'border-green-300', 'bg-red-100', 'border-red-300', 'bg-white');
+                
+                // Only check if it has been moved from the bank
+                if (parent.id !== 'holiday-bank') {
+                    if (targetCat === itemCat) {
+                        item.classList.add('bg-green-100', 'border-green-300');
+                    } else {
+                        item.classList.add('bg-red-100', 'border-red-300');
+                    }
+                } else {
+                    item.classList.add('bg-white');
+                }
+            });
+        }
+
+        // --- Travel Words Check ---
+        function checkConfusingWords() {
+            const selects = document.querySelectorAll('.conf-word');
+            selects.forEach(s => {
+                if(s.value === s.getAttribute('data-ans')) {
+                    s.classList.add('text-green-600', 'border-green-500');
+                    s.classList.remove('text-blue-700', 'border-blue-300', 'text-red-500', 'border-red-500');
+                } else {
+                    s.classList.add('text-red-500', 'border-red-500');
+                    s.classList.remove('text-green-600', 'border-green-500', 'text-blue-700', 'border-blue-300');
+                }
+            });
+        }
+
+        // --- Word Formation Check ---
+        function checkWFAdjectives() {
+            const inputs = document.querySelectorAll('.wf-adj');
+            inputs.forEach(i => {
+                if(i.value.trim().toLowerCase() === i.getAttribute('data-ans')) {
+                    i.classList.add('text-green-600', 'border-green-500');
+                    i.classList.remove('text-red-500', 'border-red-500', 'text-indigo-900', 'border-indigo-300');
+                } else {
+                    i.classList.add('text-red-500', 'border-red-500');
+                    i.classList.remove('text-green-600', 'border-green-500', 'text-indigo-900', 'border-indigo-300');
+                }
+            });
+        }
+
+        // --- Grammar Selects Check ---
+        function checkGrammarSelects() {
+            const selects = document.querySelectorAll('.g-sel');
+            selects.forEach(s => {
+                if(s.value === 'c') {
+                    s.classList.add('bg-green-100', 'text-green-700');
+                    s.classList.remove('bg-red-100', 'text-red-700');
+                } else {
+                    s.classList.add('bg-red-100', 'text-red-700');
+                    s.classList.remove('bg-green-100', 'text-green-700');
+                }
+            });
+        }
+
+        // --- Prepositions Check ---
+        function checkPrepositions() {
+            const inputs = document.querySelectorAll('.glass-card .g-input');
+            inputs.forEach(i => {
+                if(i.closest('.bg-rose-50')) return; // handled separately? No, unified here for rose section
+            });
+            // Specific check for the rose section inputs
+            const roseInputs = document.querySelectorAll('.bg-rose-50 .g-input');
+            roseInputs.forEach(i => {
+                if(i.value.trim().toLowerCase() === i.getAttribute('data-ans')) {
+                    i.classList.add('text-green-600', 'border-green-500');
+                    i.classList.remove('text-red-500', 'border-red-500');
+                } else {
+                    i.classList.add('text-red-500', 'border-red-500');
+                }
+            });
+        }
+
+        // --- Past Perfect Check ---
+        function checkPastPerfect() {
+            const inputs = document.querySelectorAll('.bg-purple-50 .g-input');
+            inputs.forEach(i => {
+                if(i.value.trim().toLowerCase() === i.getAttribute('data-ans')) {
+                    i.classList.add('text-green-600', 'border-green-500');
+                    i.classList.remove('text-red-500', 'border-red-500');
+                } else {
+                    i.classList.add('text-red-500', 'border-red-500');
+                }
+            });
+        }
+
+        // --- Exam Part 3 Check ---
+        function checkExamPart3() {
+            const inputs = document.querySelectorAll('.space-y-4 .g-input');
+            inputs.forEach(i => {
+                if(i.value.trim().toUpperCase() === i.getAttribute('data-ans')) {
+                    i.classList.add('text-green-600', 'border-green-500');
+                    i.classList.remove('text-red-500', 'border-red-500');
+                } else {
+                    i.classList.add('text-red-500', 'border-red-500');
+                }
+            });
+        }
+
+        // --- Exam Part 7 Check ---
+        function checkExamPart7() {
+            const selects = document.querySelectorAll('.p7-sel');
+            selects.forEach(s => {
+                if(s.value === s.getAttribute('data-ans')) {
+                    s.classList.add('bg-green-100', 'text-green-700');
+                    s.classList.remove('bg-red-100', 'text-red-700');
+                } else {
+                    s.classList.add('bg-red-100', 'text-red-700');
+                }
+            });
+        }
+
+        // --- Review Checks ---
+        function checkReviewWB() {
+            const inputs = document.querySelectorAll('.bg-white .g-input'); 
+            // Select inputs specifically in the review section WB card
+            const container = event.target.parentElement;
+            const wbInputs = container.querySelectorAll('.g-input');
+            wbInputs.forEach(i => {
+                if(i.value.trim().toLowerCase() === i.getAttribute('data-ans')) {
+                    i.classList.add('text-green-600', 'border-green-500');
+                    i.classList.remove('text-red-500', 'border-red-500');
+                } else {
+                    i.classList.add('text-red-500', 'border-red-500');
+                }
+            });
+        }
+
+        function checkReviewVocab() {
+            const container = event.target.parentElement;
+            const vInputs = container.querySelectorAll('.g-input');
+            vInputs.forEach(i => {
+                if(i.value.trim().toLowerCase() === i.getAttribute('data-ans')) {
+                    i.classList.add('text-green-600', 'border-green-500');
+                    i.classList.remove('text-red-500', 'border-red-500');
+                } else {
+                    i.classList.add('text-red-500', 'border-red-500');
+                }
+            });
+        }
+
+        // --- Writing Word Count ---
+        const textarea = document.getElementById('report-text');
+        const countDisplay = document.getElementById('word-count');
+        
+        function updateCount() {
+            const text = textarea.value.trim();
+            const count = text === '' ? 0 : text.split(/\s+/).length;
+            countDisplay.textContent = count + " words";
+            
+            if(count >= 140 && count <= 190) {
+                countDisplay.classList.add('text-emerald-600', 'font-bold');
+                countDisplay.classList.remove('text-red-500');
+            } else if (count > 190) {
+                countDisplay.classList.add('text-red-500', 'font-bold');
+                countDisplay.classList.remove('text-emerald-600');
+            } else {
+                countDisplay.classList.remove('text-emerald-600', 'text-red-500', 'font-bold');
+            }
+        }
+        
+        if(textarea) {
+            textarea.addEventListener('input', updateCount);
+        }
+
+    </script>
+</body>
+</html>
